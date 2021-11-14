@@ -3,83 +3,97 @@
 '''BaseModel unittests'''
 
 import unittest
+import re
 from models.base_model import BaseModel
-import datetime
-import time
+from datetime import datetime
+from time import sleep
 
 
 class TestBaseModel(unittest.TestCase):
     """class TestBaseModel"""
 
-    def test_base_model_class_membership_and_attributes(self):
-        """BaseModel is right class with correct attrs"""
-        base = BaseModel()
-        self.assertIsInstance(base, BaseModel)
-        self.assertIsNotNone(base.id)
-        self.assertIsNotNone(base.created_at)
-        self.assertIsNotNone(base.updated_at)
+    def test_createAttr_noArgs(self):
+        '''create Instance w/o args'''
+        my_model = BaseModel()
+        my_model.name = "Holberton"
+        self.assertEqual(my_model.name, "Holberton")
 
-    def test_base_model_attr_type(self):
-        """BaseModel attributes are correct type"""
-        base = BaseModel()
-        self.assertIsInstance(base.id, str)
-        self.assertEqual(len(base.id), 36)
-        self.assertIsInstance(base.created_at, datetime.datetime)
-        self.assertIsInstance(base.updated_at, datetime.datetime)
+    def test_id_noArgs(self):
+        '''check type/value of id w/o args'''
+        my_model = BaseModel()
+        self.assertTrue(my_model.id)
+        self.assertEqual(type(my_model.id), str)
 
-    def test_base_model_updated_at_matches_created_at_initialization(self):
-        """BaseModel updated_at is same as create_at"""
-        base = BaseModel()
-        self.assertEqual(base.updated_at, base.created_at)
+    def test_created_at_noArgs_type(self):
+        '''check type of created_at w/o args'''
+        my_model = BaseModel()
+        self.assertEqual(type(my_model.created_at), datetime)
 
-    def test_base_model_str_method(self):
-        """BaseModel str method creates accurate representation"""
-        base = BaseModel()
-        base_str = base.__str__()
-        self.assertIsInstance(base_str, str)
-        self.assertEqual(base_str[:11], '[BaseModel]')
-        self.assertEqual(base_str[12:50], '({})'.format(base.id))
-        self.assertDictEqual(eval(base_str[51:]), base.__dict__)
+    def test_created_at_noArgs_format(self):
+        '''check format %Y-%M-%DT%H:%M:%S.%MS'''
+        datetime_format = re.compile(
+            "\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+$")
+        my_model = BaseModel()
+        my_created_at = my_model.to_dict()['created_at']
+        format_found = datetime_format.match(my_created_at)
+        self.assertIsNotNone(format_found)
 
-    def test_base_model_save_method(self):
-        """BaseModel save method alters update_at date"""
-        base = BaseModel()
-        time.sleep(0.0001)
-        base.save()
-        self.assertNotEqual(base.updated_at, base.created_at)
+    def test_created_at_noArgs_value(self):
+        '''check value of created_at w/o args'''
+        now = datetime.now().replace(microsecond=0)
+        my_model = BaseModel()
+        self.assertEqual(my_model.created_at.replace(microsecond=0), now)
 
-    def test_base_model_to_dict_method(self):
-        """BaseModel to_dict method creates accurate dictionary"""
-        base = BaseModel()
-        base_dict = base.to_dict()
-        self.assertIsInstance(base_dict, dict)
-        self.assertEqual(base_dict['id'], base.id)
-        self.assertEqual(base_dict['__class__'], type(base).__name__)
-        self.assertEqual(base_dict['created_at'], base.created_at.isoformat())
-        self.assertEqual(base_dict['updated_at'], base.updated_at.isoformat())
-        self.assertIsInstance(base.created_at, datetime.datetime)
-        self.assertIsInstance(base.updated_at, datetime.datetime)
+    def test_created_at_noArgs_afterSave(self):
+        '''check created_at w/o args after save()'''
+        my_model = BaseModel()
+        my_created_at = my_model.created_at
+        my_model.save()
+        self.assertEqual(my_model.created_at, my_created_at)
 
-    def test_base_model_dict_to_instance_with_kwargs(self):
-        """BaseModel can instantiate new object with dictionary"""
-        base = BaseModel()
-        base.name = "Betty"
-        base.number = 972
-        base_dict = base.to_dict()
-        new_base = BaseModel(**base_dict)
-        new_base_dict = new_base.to_dict()
-        self.assertFalse(new_base is base)
-        self.assertDictEqual(new_base_dict, base_dict)
+    def test_updated_at_noArgs_type(self):
+        '''check type updated_at'''
+        my_model = BaseModel()
+        self.assertEqual(type(my_model.updated_at), datetime)
 
-    def test_base_model_dict_to_instance_with_empty_kwargs(self):
-        """BaseModel can instantiate new object with empty dict"""
-        base_dict = {}
-        new_base = BaseModel(**base_dict)
-        new_base_dict = new_base.to_dict()
-        self.assertIsInstance(new_base, BaseModel)
-        self.assertIsNotNone(new_base.id)
-        self.assertIsNotNone(new_base.created_at)
-        self.assertIsNotNone(new_base.updated_at)
+    def test_updated_at_noArgs_format(self):
+        '''check format %Y-%M-%DT%H:%M:%S.%MS'''
+        datetime_format = re.compile(
+            "\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+$")
+        my_model = BaseModel()
+        my_updated_at = my_model.to_dict()['updated_at']
+        format_found = datetime_format.match(my_updated_at)
+        self.assertIsNotNone(format_found)
+
+    def test_updated_at_noArgs_value(self):
+        '''check value of updated_at'''
+        now = datetime.now().replace(microsecond=0)
+        my_model = BaseModel()
+        self.assertEqual(my_model.updated_at.replace(microsecond=0), now)
+
+    def test_updated_at_noArgs_value_afterSave(self):
+        '''check value of updated_at after save()'''
+        my_model = BaseModel()
+        updated_pre = my_model.updated_at
+        my_model.save()
+        self.assertTrue(my_model.updated_at > updated_pre)
+
+    def test_str(self):
+        '''check __str__ method'''
+        my_model = BaseModel()
+        r = re.compile("\[BaseModel\] (.*) {.*}")
+        my_str = my_model.__str__()
+        self.assertIsNotNone(r.match(my_str))
+
+    def test_to_dict_noAditonalAttr(self):
+        '''check to_dict w/o additional Attributes'''
+        my_model = BaseModel()
+        BaseModel.name = "holberton"
+        attributes = {}
+        for key, value in my_model.to_dict().items():
+            if (key not in ('__class__', 'id', 'created_at', 'updated_at')):
+                attributes[key] = value
+        self.assertFalse(attributes)
 
 if __name__ == '__main__':
     unittest.main()
