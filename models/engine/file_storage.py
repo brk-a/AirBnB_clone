@@ -19,7 +19,9 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
+
     def all(self):
+
         """
             Returns the class `__objects` variable.
         """
@@ -46,6 +48,22 @@ class FileStorage:
                 json.dump(obj_dict, f)
         except IOError:
             pass
+
+        '''all method returns dict of objs'''
+        return self.__objects
+
+    def new(self, obj):
+        '''new method adds obj to __objects dict'''
+        if obj:
+            key = f'{type(obj).__name__}.{obj.id}'
+            self.__objects[key] = obj
+    def save(self):
+        '''save method serialises __objects to JSON file at __filepath'''
+        obj_dict = {k:v.to_dict() for (k, v) in self.__objects.items()}
+        json_str = json.dumps(obj_dict)
+
+        with open(self.__file_path, 'w', encoding='utf-8') as f:
+            f.write(json_str)
 
     def reload(self):
         """
