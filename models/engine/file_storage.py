@@ -17,32 +17,32 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
-        '''all method returns dict of objs'''                                                                                              
-        return self.__objects                                                                                       
-                                                                                                                    
-    def new(self, obj):                                                                                             
-        '''new method adds obj to __objects dict'''
-        if obj:                                                                                                     
-            key = f'{type(obj).__name__}.{obj.id}'                                                        
-            self.__objects[key] = obj                                                                               
-                                                                                                                    
-    def save(self):                                                                                                 
-        '''save method serialises __objects to JSON file at __filepath'''                                           
-        obj_dict = {k : v.to_dict() for (k, v) in self.__objects.items()}                                                                                                                                                            
-                                                                                                                 
-        json_str = json.dumps(obj_dict)
+    """ Public instance methods """
 
-        with open(self.__file_path, 'w', encoding='utf-8') as f:
-            f.write(json_str)
+    def all(self):
+        ''' Returns the dictionary __objects '''
+        return (self.__objects)
+
+    def new(self, obj):
+        ''' Sets in __objects the obj with key <obj class name>.id '''
+        key = obj.__class__.__name__ + "." + obj.id
+        self.__objects[key] = obj
+
+    def save(self):
+        ''' SERIALIZES __objects to the JSON file (path: __file_path) '''
+        for key, value in self.__objects.items():
+            if not isinstance(value, dict):
+                self.__objects[key] = value.to_dict()
+        with open(self.__file_path, 'w') as f:
+            json.dump(self.__objects, f)
 
     def reload(self):
-        '''reload method deserialises JSON file to __objects'''
+        ''' DESERIALIZES the JSON file to __objects
+        (only if the JSON file (__file_path) exists '''
         try:
-            with open(self.__file_path, 'r', encoding='utf-8') as f:
-                json_dict = json.load(f)
-                for obj_dict in json_dict.values():
-                    cls = obj_dict['__class__']
-                    self.new(eval(f'{cls}({"**obj_dict"})'))
+            with open(self.__file_path, 'r') as f:
+                file_json = json.load(f)
+            for key, value in file_json.items():
+                self.__objects[key] = eval(value['__class__'])(**value)
         except FileNotFoundError:
             pass
