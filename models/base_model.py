@@ -23,15 +23,9 @@ class BaseModel:
                 if key == 'created_at' or key == 'updated_at':
                     self.__dict__[key] = datetime.strptime(value, format_iso)
                 else:
-
                     self.__dict__[key] = value
         else:
             models.storage.new(self)
-
-                    self.id = str(uuid.uuid4())
-                    self.created_at = datetime.datetime.now()
-                    self.updated_at = self.created_at
-                    models.storage.new(self)
 
     def __str__(self):
         ''' Should print: [<class name>] (<self.id>) <self.__dict__> '''
