@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-'''Saves objs in file to FileStorage class attr __objects'''
+""" Unique FileStorage instance for the application """
 from models.engine.file_storage import FileStorage
 
-
+''' Variable instance of FileStorage'''
 storage = FileStorage()
 storage.reload()

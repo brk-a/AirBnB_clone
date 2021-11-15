@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-
-'''State module'''
+""" Class state that inhertis from BaseModel """
 
 from models.base_model import BaseModel
 
 
 class State(BaseModel):
-    ''' class state for every user's state'''
+    """ Public class attribute from state """
+
     name = ""

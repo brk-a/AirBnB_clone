@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-
-'''BaseModel unittests'''
-
+'''test models'''
 import unittest
 import re
 from models.base_model import BaseModel
@@ -10,7 +8,7 @@ from time import sleep
 
 
 class TestBaseModel(unittest.TestCase):
-    """class TestBaseModel"""
+    '''test BaseModel'''
 
     def test_createAttr_noArgs(self):
         '''create Instance w/o args'''
@@ -94,6 +92,3 @@ class TestBaseModel(unittest.TestCase):
             if (key not in ('__class__', 'id', 'created_at', 'updated_at')):
                 attributes[key] = value
         self.assertFalse(attributes)
-
-if __name__ == '__main__':
-    unittest.main()
